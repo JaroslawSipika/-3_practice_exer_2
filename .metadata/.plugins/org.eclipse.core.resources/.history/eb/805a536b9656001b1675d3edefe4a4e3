@@ -1,0 +1,25 @@
+import java.rmi.Naming;
+
+public class MojaUslugaKlient {
+
+	public static void main(String[] args) {
+		new MojaUslugaKlient().doRoboty();
+
+	}
+
+	public void doRoboty() {
+		try {
+			
+			MojaUsluga usluga = (MojaUsluga) Naming.lookup("rmi://localhost/NotacjaONP");
+			String s = usluga.ZamienNaONP("(2+4)*(3-8)^2");
+			System.out.println("Równanie w postaci ONP: " + s);
+			double wynik = usluga.ObliczONP(s);
+			System.out.println("Wynikiem równania jest: " + wynik);
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+}

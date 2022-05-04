@@ -1,0 +1,52 @@
+import java.rmi.Naming;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Scanner;
+import java.util.Stack;
+import java.util.StringTokenizer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+
+
+
+public class MojaUslugaImpl extends UnicastRemoteObject implements MojaUsluga
+{
+
+	public MojaUslugaImpl() throws RemoteException {}
+
+	public String ZamienNaONP(String wyrazenie) throws RemoteException {
+		
+
+		return null;
+		  
+	}
+	public double ObliczONP(String b) throws RemoteException {
+		
+		return 0;
+	}
+	
+	
+
+	public static void main(String[] args) {
+		try {
+			MojaUsluga usluga = new MojaUslugaImpl();
+			Registry reg = LocateRegistry.createRegistry(1099);
+			reg.bind("NotacjaONP", usluga);
+ 
+			Context context = new InitialContext();
+			context.bind("NotacjaONP", usluga);
+			System.out.println("OK...");
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
+	
+
+}

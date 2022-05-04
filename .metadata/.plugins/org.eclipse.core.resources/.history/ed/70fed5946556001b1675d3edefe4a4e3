@@ -1,0 +1,137 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class BazaDanych {
+	public BazaDanych()
+	{
+		if(BazaDanych.checkDriver())
+		{
+			BazaDanych.tworzBaze();
+		}
+	}
+	
+	private static int executeUpdate(Statement s, String sql) {
+		try {
+			return s.executeUpdate(sql);
+		} catch (SQLException e) {
+			
+		}
+		return -1;
+	}
+	
+	public static boolean checkDriver() {
+		System.out.println("Sprawdzanie sterownika");
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			System.out.println("Sterownik poprawny");
+			return true;
+		} catch (Exception e) {
+			System.out.println("Blad przy ladowaniu sterownika bazy!");
+			return false;
+		}
+	}	
+	
+	public static void tworzBaze()
+	{
+		try {
+		Connection connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","");
+		Statement statement=connection.createStatement();
+		String nazwaBazy="bazapj1";
+		String dodajBaze ="CREATE DATABASE " + nazwaBazy + ";";
+		
+		if(executeUpdate(statement, "USE " + nazwaBazy +";") == 0)
+		{
+			System.out.println("Baza istnieje");
+		}
+		else
+		{
+			statement.executeUpdate(dodajBaze);
+			System.out.println("Baza utworzona");
+			statement.executeUpdate("USE " + nazwaBazy + ";");
+
+			String tabelaPytania="CREATE TABLE pytania ( id INT NOT NULL AUTO_INCREMENT , pytanie VARCHAR(100) NOT NULL , a VARCHAR(100) NOT NULL , b VARCHAR(100) NOT NULL , c VARCHAR(100) NOT NULL , d VARCHAR(100) NOT NULL , poprawnaOdp CHAR NOT NULL , PRIMARY KEY (id));";
+			String tabelaWyniki="CREATE TABLE wyniki ( id INT NOT NULL AUTO_INCREMENT , student VARCHAR(100) NOT NULL , wynik INT NOT NULL , PRIMARY KEY (id));";
+			String tabelaOdpowiedzi="CREATE TABLE odpowiedzi ( id INT NOT NULL AUTO_INCREMENT , student VARCHAR(100) NOT NULL , pytanie1 CHAR NOT NULL , pytanie2 CHAR NOT NULL , pytanie3 CHAR NOT NULL , pytanie4 CHAR NOT NULL , pytanie5 CHAR NOT NULL , PRIMARY KEY (id)) ;";
+			statement.executeUpdate(tabelaPytania);
+			statement.executeUpdate(tabelaWyniki);
+			statement.executeUpdate(tabelaOdpowiedzi);
+		 	
+			String pytanie1="INSERT INTO pytania (pytanie, a, b, c, d, poprawnaOdp) VALUE ( 'Oprogramowanie to inaczej?', 'a) hardware', 'b) software', 'c) hywared', 'd) hydroware', 'b' );";
+			String pytanie2="INSERT INTO pytania (pytanie, a, b, c, d, poprawnaOdp) VALUE ( '1 bajt to?', 'a) 8 bitow', 'b) 4 bity', 'c) 16 bitow', 'd) 2 bity', 'a' );";
+			String pytanie3="INSERT INTO pytania (pytanie, a, b, c, d, poprawnaOdp) VALUE ( 'Systemem operacyjnym NIE jest?', 'a) Symbian', 'b) Linux', 'c) Power Point', 'd) Unix', 'c' );";
+			String pytanie4="INSERT INTO pytania (pytanie, a, b, c, d, poprawnaOdp) VALUE ( 'Jaki jest skrót kopiowania?', 'a) CTRL+C', 'b) CTRL+V', 'c) CTRL+X', 'd) CTRL+Y', 'a' );";
+			statement.executeUpdate(pytanie1);
+			statement.executeUpdate(pytanie2);
+			statement.executeUpdate(pytanie3);
+			statement.executeUpdate(pytanie4);
+		}
+		connection.close();
+		statement.close();
+		}
+		catch(SQLException e)
+		{
+			System.out.println(e.getMessage());
+			System.out.println(e.getErrorCode());
+		}	
+	}
+	
+	public void dodajWynik(String user,int wynik)
+	{
+		try {
+		Connection connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","");
+		Statement statement=connection.createStatement();
+		statement.executeUpdate("USE bazapj1;");
+		String dodajwynik="INSERT INTO wyniki(student,wynik) VALUE ('"+ user + "'," + wynik+");";
+		statement.executeUpdate(dodajwynik);
+		connection.close();
+		statement.close();
+		}catch(SQLException e){
+			System.out.println(e.getMessage());
+			System.out.println(e.getErrorCode());
+		}		
+	}
+
+	public void dodajOdpowiedz(String student,char pytanie1,char pytanie2,char pytanie3,char pytanie4,char pytanie5)
+	{
+	try {
+	Connection connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","");
+	Statement statement=connection.createStatement();
+	statement.executeUpdate("USE bazapj1;");
+	String dodajodpowiedz = "INSERT INTO odpowiedzi(student, pytanie1, pytanie2, pytanie3, pytanie4, pytanie5) VALUE ('"+student+"','"+pytanie1+"','"+pytanie2+"','"+pytanie3+"','"+pytanie4+"','"+pytanie5+"');"; 
+	statement.executeUpdate(dodajodpowiedz);
+	connection.close();
+	statement.close();
+	}
+	  catch(SQLException e)
+		{	
+			System.out.println(e.getMessage());
+			System.out.println(e.getErrorCode());
+		}		
+	}
+	
+	public String zwrocDane(String rodzaj, int id)
+	{
+		try {
+			Connection connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","");
+			Statement statement=connection.createStatement();
+			statement.executeUpdate("USE bazapj1;");
+			String pytanie="SELECT " + rodzaj + " FROM pytania WHERE id="+id + ";";
+			ResultSet resultset=statement.executeQuery(pytanie);
+			resultset.next();
+			String wynik = resultset.getString(rodzaj);
+			return wynik;
+		}
+			catch(SQLException e)
+			{
+				System.out.println(e.getMessage());
+				System.out.println(e.getErrorCode());
+				return "error";
+			}		
+	}
+}
+
+
+

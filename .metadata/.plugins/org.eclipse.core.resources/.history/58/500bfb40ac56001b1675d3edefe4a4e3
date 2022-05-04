@@ -1,0 +1,22 @@
+
+public class Test {
+
+	public static void main(String[] args) {
+		String buduj = "";
+		char czar = '2';
+		
+		buduj+=czar;
+		
+		int licznik = 0;
+		
+		String wejscie = "2";
+		
+		char czar1=wejscie.charAt(licznik);
+		System.out.println(czar1);
+		
+		
+		
+		System.out.println(buduj);
+	}
+
+}

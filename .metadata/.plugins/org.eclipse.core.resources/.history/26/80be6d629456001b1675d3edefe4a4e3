@@ -1,0 +1,37 @@
+import java.rmi.Naming;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+
+public class MojaUslugaImpl extends UnicastRemoteObject implements MojaUsluga
+{
+
+	public MojaUslugaImpl() throws RemoteException {}
+
+	public String ZamienNaONP(String a) throws RemoteException {
+		
+		return null;
+	}
+
+	public double ObliczONP(String b) throws RemoteException {
+		
+		return 0;
+	}
+	
+	
+
+	public static void main(String[] args) {
+		try {
+			MojaUsluga usluga = new MojaUslugaImpl();
+			Naming.rebind("Notacja ONP", usluga);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
+
+
+
+
+}

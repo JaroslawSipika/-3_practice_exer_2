@@ -1,0 +1,148 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+
+
+
+public class Serwer1 {
+	
+	PrintWriter out;
+	InputStreamReader instr; 
+	BufferedReader in;
+	ArrayList<Pytanie> listaPytan;
+	Socket gniazdoKlienta;
+
+	static int m = 0;
+	
+	
+	public class Pytanie{
+		
+		public String wiersz1;
+		
+		public Pytanie(String a) {
+			{
+				wiersz1 = a;
+			}
+		
+	}
+	}
+	
+	
+	public void wczytajPytania() {
+		
+		listaPytan = new ArrayList<Pytanie>();
+		
+		try {
+			File mojPlik = new File("bazaPytan.txt");
+			FileReader czytelnikF = new FileReader(mojPlik);
+			BufferedReader czytelnikK = new BufferedReader(czytelnikF);
+			
+			String wiersz = null;
+			
+			while((wiersz = czytelnikK.readLine()) != null) {
+	
+				Pytanie pytanko = new Pytanie(wiersz);
+				listaPytan.add(pytanko);
+			}
+			czytelnikK.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	
+	}
+	
+
+	public void doRoboty() {
+		
+		try {
+			
+			ServerSocket gniazdoSrw = new ServerSocket(4995);
+			
+			while(true) {
+				gniazdoKlienta = gniazdoSrw.accept();
+				
+				
+				instr = new InputStreamReader(gniazdoKlienta.getInputStream());
+				out = new PrintWriter(gniazdoKlienta.getOutputStream());    
+				in = new BufferedReader(instr);
+				
+
+				String []pytania = {listaPytan.get(0).wiersz1,listaPytan.get(1).wiersz1,listaPytan.get(2).wiersz1,listaPytan.get(3).wiersz1} ;
+				
+			
+				String msgin="";
+				int i = 0;
+				
+				while(!msgin.equals("end")) {
+				
+					msgin = in.readLine();
+					out.println(pytania[i]);
+					out.flush();
+					i++;
+				}
+				
+				gniazdoKlienta.close();
+				
+				
+				
+				
+				
+				
+				//sendMessage();
+			//	komunikacja();
+			
+				
+				}
+			}
+		
+			catch(Exception e) {
+			System.out.println("Problem");
+			e.printStackTrace();
+		}
+	}	
+
+	
+//	public void komunikacja() {
+//		
+//		String wiadomosc = "";
+		
+//		try {
+//				wiadomosc = in.readLine();
+//				in.close();
+//			
+		
+//		} catch (IOException e) {
+	
+//			e.printStackTrace();
+//		}
+//	}
+
+ //   public void sendMessage()
+  //  {
+	//			String []pytania = {listaPytan.get(0).wiersz1,listaPytan.get(1).wiersz1,listaPytan.get(2).wiersz1,listaPytan.get(3).wiersz1} ;
+		//	
+		//		out.print(pytania[m]);
+			//	out.flush();
+				
+		//		m++;
+		
+	//			out.close();
+
+    //}
+	
+	public static void main(String[] args) {
+		
+		Serwer1 serwerek = new Serwer1();
+		serwerek.wczytajPytania();
+		serwerek.doRoboty();
+	}
+}

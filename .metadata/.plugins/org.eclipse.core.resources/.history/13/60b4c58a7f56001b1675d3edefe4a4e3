@@ -1,0 +1,139 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class Teksty{
+	boolean newTxt = false;
+	Lock lock=new ReentrantLock(); 
+	Condition txtWritten = lock.newCondition();  
+	Condition txtSupplied = lock.newCondition();
+	
+	void setTextToWrite(String str) {
+		lock.lock(); 
+		try {
+				while(newTxt == true) {		 
+					txtWritten.await(); 
+				}
+				FileWriter f;
+				try {
+					f = new FileWriter(".\\plik.txt", true);
+					BufferedWriter out = new BufferedWriter(f);
+					out.write(str);
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+			newTxt=true; 
+			txtSupplied.signal(); 
+		}catch(InterruptedException e) { 
+			
+		}finally {
+			lock.unlock(); 
+		}	
+	}
+	
+	String getTextToWrite() throws InterruptedException{
+		String strLine;
+		String dane="";
+		lock.lock(); 
+		try {	
+			while(newTxt == false) {
+				txtSupplied.await(); 
+			}
+			try {
+				FileInputStream x = new FileInputStream(".\\plik.txt");
+				DataInputStream in = new DataInputStream(x);
+				BufferedReader r = new BufferedReader(new InputStreamReader(in));
+				String temp=null;
+				try {
+					while((strLine = r.readLine()) != null) {
+						temp=strLine;
+					}
+						dane += temp;
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}		
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			newTxt=false; 
+			txtWritten.signal(); 
+			return dane;					
+		}catch(InterruptedException e) {			
+				e.printStackTrace();
+		}finally {
+			lock.unlock(); 
+		}
+			return dane;
+	}
+}
+
+class Writer implements Runnable {
+	Teksty txtArea;
+	Writer(Teksty t){
+		txtArea=t;
+	}
+	public void run() {	
+		try {
+			String txt = txtArea.getTextToWrite();
+			while(!txt.equals("stop")) {
+				System.out.println("-> " + txt);
+				txt = txtArea.getTextToWrite();
+			}
+		} catch(InterruptedException e) {
+			e.printStackTrace();
+		}	
+	}	
+}
+
+
+class Author implements Runnable{ 
+	Teksty txtArea;
+	Scanner scan = new Scanner(System.in);
+	Author(Teksty t) {
+		txtArea=t;
+	}
+	
+	public void run() {
+		String s;
+		while(true){
+			s=(scan.nextLine());
+			if(!s.equals("stop")) {
+				txtArea.setTextToWrite(s + "\n");		
+			}
+			else{
+				txtArea.setTextToWrite(s + "\n");
+				break;
+			}		
+		}			
+	}
+}
+
+
+public class Zadanie4 {
+
+	public static void main(String[] args) {
+		System.out.println("'stop' zatrzymuje dzialanie");
+		Teksty t = new Teksty();
+		Author autor = new Author(t);
+		Writer writer = new Writer(t);
+		Thread th = new Thread(autor);
+		Thread th2 = new Thread(writer);
+		th.start();
+		th2.start();
+	}
+}

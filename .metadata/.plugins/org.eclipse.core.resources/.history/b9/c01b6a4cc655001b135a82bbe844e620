@@ -1,0 +1,148 @@
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.util.Scanner;
+
+import javax.swing.*;
+
+
+
+public class AplikacjaTest2 {
+	
+	JTextArea pytanie;
+	JTextArea odpowiedz;
+	
+
+	public void tworzGrafike() {
+		JFrame ramka = new JFrame("Aplikacja do przeprowadzenia testu");
+		ramka.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel panel = new JPanel();
+		Font czcionka = new Font("sanserif" , Font.BOLD, 24);
+		
+		pytanie = new JTextArea(6, 20);
+		pytanie.setLineWrap(true);
+		pytanie.setWrapStyleWord(true);
+		pytanie.setFont(czcionka);
+		
+		JScrollPane przewijaniePyt = new JScrollPane(pytanie);
+		przewijaniePyt.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijaniePyt.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		
+		odpowiedz = new JTextArea(1, 20);
+		odpowiedz.setLineWrap(true);
+		odpowiedz.setWrapStyleWord(true);
+		odpowiedz.setFont(czcionka);
+		
+		JScrollPane przewijanieOdp = new JScrollPane(odpowiedz);
+		przewijanieOdp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijanieOdp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		JLabel etykietaPyt = new JLabel ("Pytanie:");
+		JLabel etykietaOdp = new JLabel ("Odpowiedz:");
+		
+		JButton przyciskWyslij = new JButton("Wyœlij odpowiedz");
+		JButton przyciskStart = new JButton("Zacznij test");
+		
+		panel.add(etykietaPyt);
+		panel.add(przewijaniePyt);
+		panel.add(etykietaOdp);
+		panel.add(przewijanieOdp);
+		panel.add(przyciskStart);
+		panel.add(przyciskWyslij);
+		
+		
+		przyciskStart.addActionListener(new PrzyciskStartListener());
+		przyciskWyslij.addActionListener(new PrzyciskWyslijListener());
+		
+		ramka.getContentPane().add(BorderLayout.CENTER, panel);
+		ramka.setSize(500, 400);
+		ramka.setVisible(true);	
+	}
+	
+	
+	
+	
+	
+	
+	public class PrzyciskStartListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			
+				komunikacja();
+				
+		}
+	
+		}
+
+		public void komunikacja() {
+			try {
+				
+				Scanner scn = new Scanner(System.in);
+				InetAddress ip = InetAddress.getByName("localhost");
+				
+				Socket s = new Socket("localhost",5055);
+				DataInputStream dis = new DataInputStream(s.getInputStream());
+				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+				
+				
+				
+				while (true)
+				{
+					
+					System.out.println(dis.readUTF());
+					
+					String tosend = scn.nextLine();
+					dos.writeUTF(tosend);
+				
+					
+				
+					if(tosend.equals("Exit"))
+					{ 
+	                    System.out.println("Closing this connection : " + s); 
+	                    s.close(); 
+	                    System.out.println("Connection closed"); 
+	                    break; 
+	                } 
+				
+					String received = dis.readUTF(); 
+	                System.out.println(received); 
+	          
+	            } 
+				
+				
+				scn.close();
+				dis.close();
+				dos.close();
+				
+				
+			} catch(Exception e1) {
+				e1.printStackTrace();
+			
+		}
+	}
+	public class PrzyciskWyslijListener implements ActionListener {
+		
+		public void actionPerformed(ActionEvent e) {
+			
+		}
+	}
+	
+	
+	public static void main(String[] args) throws IOException {
+		
+		AplikacjaTest2 aplikacja = new AplikacjaTest2();
+		aplikacja.tworzGrafike();
+		
+			
+	}
+}

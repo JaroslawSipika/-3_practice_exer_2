@@ -1,0 +1,148 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+class Tekst{
+	boolean newTxt = false;
+	Lock lock=new ReentrantLock(); 
+	Condition txtWritten = lock.newCondition();  
+	Condition txtSupplied = lock.newCondition();
+
+	public String pobierzTekst() {
+		String strLine;
+		String dane="";
+		lock.lock(); 
+		try {	
+			while(newTxt == false) {
+				txtSupplied.await(); 
+			}
+			try {
+				FileInputStream x = new FileInputStream(".\\plik.txt");
+				DataInputStream in = new DataInputStream(x);
+				BufferedReader r = new BufferedReader(new InputStreamReader(in));
+				String temp=null;
+				try {
+					while((strLine = r.readLine()) != null) {
+						temp=strLine;
+					}
+						dane += temp;
+					in.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}		
+				
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			newTxt=false; 
+			txtWritten.signal(); 
+			return dane;					
+		}catch(InterruptedException e) {			
+				e.printStackTrace();
+		}finally {
+			lock.unlock(); 
+		}
+			return dane;
+	}
+	
+
+	public void ustawTekst(String str) {
+		lock.lock(); 
+		try {
+				while(newTxt == true) {		 
+					txtWritten.await(); 
+				}
+				FileWriter f;
+				try {
+					f = new FileWriter(".\\plik.txt", true);
+					BufferedWriter out = new BufferedWriter(f);
+					out.write(str);
+					out.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+			newTxt=true; 
+			txtSupplied.signal(); 
+		}catch(InterruptedException e) { 
+			
+		}finally {
+			lock.unlock(); 
+		}	
+	}
+	
+}
+
+class Author implements Runnable{
+
+	Tekst obszar;
+	Scanner scanner = new Scanner(System.in);
+	
+	public Author(Tekst tekst) {
+		obszar = tekst;
+	}
+
+	public void run() {
+		
+		String u;
+		while(true) {
+			u = (scanner.nextLine());
+			if(!u.equals("exit")) {
+				obszar.ustawTekst(u + "\n");
+			}else {
+				obszar.ustawTekst(u + "\n");
+			}
+		}
+		
+	}
+	
+}
+
+class Writer implements Runnable{
+
+	Tekst obszar;
+	
+	public Writer(Tekst tekst) {
+		obszar = tekst;
+	}
+
+	public void run() {
+		
+		String tekscik = obszar.pobierzTekst();
+		while(!tekscik.equals("exit")) 
+		{
+			System.out.println(tekscik);
+			tekscik = obszar.pobierzTekst();
+		}
+		
+	}
+	
+}
+
+
+public class Rozmowa {
+
+	public static void main(String[] args) {
+		Tekst tekst = new Tekst();
+		Author author = new Author(tekst);
+		Writer writer = new Writer(tekst);
+		Thread thread1 = new Thread(author);
+		Thread thread2 = new Thread(writer);
+
+	}
+
+}
+
+
+

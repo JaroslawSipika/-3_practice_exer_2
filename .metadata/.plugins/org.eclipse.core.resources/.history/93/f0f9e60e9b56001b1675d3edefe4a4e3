@@ -1,0 +1,97 @@
+import java.rmi.Naming;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.Stack;
+import java.util.StringTokenizer;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
+
+
+
+public class MojaUslugaImpl extends UnicastRemoteObject implements MojaUsluga
+{
+
+	public MojaUslugaImpl() throws RemoteException {}
+
+	public String ZamienNaONP(String wyrazenie) throws RemoteException {
+		
+		 String wyrazenieInfiksowe;
+		 String wyrazeniePostfiksowe; 
+		 wyrazenieInfiksowe = wyrazenie;
+		 wyrazeniePostfiksowe = "";
+	
+		 Stack<String> stos = new Stack<String>();
+		 StringTokenizer st = new StringTokenizer(wyrazenieInfiksowe, "+-*/()", true);
+		        
+		  
+		  while(st.hasMoreTokens()) {
+		   String s = st.nextToken();
+		         
+		   // je¿eli element jest operatorem
+		   if( s.equals("+") || s.equals("*") || s.equals("-") || s.equals("/")) {
+		    // sprawdzemy priorytety
+		    while(!stos.empty() && priorytet(stos.peek()) >= priorytet(s)) 
+		     wyrazeniePostfiksowe += stos.pop()  + " ";
+		     // odk³adamy operator na stos
+		    stos.push(s);
+		   }
+		   // je¿eli element jest nawiasem otwieraj¹cym
+		   else if(s.equals("(")) stos.push(s);
+		   // je¿eli element jest nawiasem zamykaj¹cym
+		   else if(s.equals(")")) {
+		    // œci¹gamy operatory ze stosu, a¿ do nawiasu otwierajêcego
+		    while(!stos.peek().equals("(")) wyrazeniePostfiksowe += stos.pop() + " ";
+		    // œci¹gamy nawias otwieraj¹cy
+		    stos.pop();
+		   }
+		   // je¿eli element nie jest operatorem ani nawiasem dodajemy go do wyra¿enia postfiksowego
+		   else wyrazeniePostfiksowe += s  + " ";
+		  }
+		  // œci¹gamy ze stosu pozosta³e operatory i dodajemy je do wyra¿enia postfiksowego
+		  while(!stos.empty()) wyrazeniePostfiksowe += stos.pop()  + " ";
+		
+		return wyrazeniePostfiksowe;
+		 
+	} 
+		  
+
+	public double ObliczONP(String b) throws RemoteException {
+		
+		return 0;
+	}
+	
+	
+
+	public static void main(String[] args) {
+		try {
+			MojaUsluga usluga = new MojaUslugaImpl();
+			Registry reg = LocateRegistry.createRegistry(1099);
+			reg.bind("NotacjaONP", usluga);
+ 
+			Context context = new InitialContext();
+			context.bind("NotacjaONP", usluga);
+			System.out.println("OK...");
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+	}
+	
+	 public static int priorytet(String operator) {
+		  // dla + i - zwracamy 1
+		  if(operator.equals("+") || operator.equals("-")) return 1;
+		  // dla * i / zwracamy 2
+		  else if(operator.equals("*") || operator.equals("/")) return 2;
+		  // dla pozosta³ych 0
+		  else return 0;
+		 }
+
+
+
+}

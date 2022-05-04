@@ -1,0 +1,228 @@
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+import javax.swing.*;
+
+public class AplikacjaTest2  {
+	
+	JTextArea pytanie;
+	JTextArea odpowiedz;
+	JButton przyciskWyslij;
+	PrintWriter pisarz;
+	Socket gniazdo;
+	BufferedReader czytelnik;
+	String message = "";
+	
+	
+
+// Panel uzytkownika ok !!!
+	
+	public void doDziela() {
+		JFrame ramka = new JFrame("Aplikacja do przeprowadzenia testu");
+		ramka.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel panel = new JPanel();
+		Font czcionka = new Font("sanserif" , Font.BOLD, 24);
+		
+		pytanie = new JTextArea(6, 20);
+		pytanie.setLineWrap(true);
+		pytanie.setWrapStyleWord(true);
+		pytanie.setFont(czcionka);
+		
+		JScrollPane przewijaniePyt = new JScrollPane(pytanie);
+		przewijaniePyt.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijaniePyt.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		
+		odpowiedz = new JTextArea(1, 20);
+		odpowiedz.setLineWrap(true);
+		odpowiedz.setWrapStyleWord(true);
+		odpowiedz.setFont(czcionka);
+		
+		JScrollPane przewijanieOdp = new JScrollPane(odpowiedz);
+		przewijanieOdp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijanieOdp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		
+		przyciskWyslij = new JButton("Wyœlij odpowiedz");
+		
+		JLabel etykietaPyt = new JLabel ("Pytanie:");
+		JLabel etykietaOdp = new JLabel ("Odpowiedz:");
+		
+		JButton przyciskStart = new JButton("Zacznij test");
+		
+		panel.add(etykietaPyt);
+		panel.add(przewijaniePyt);
+		panel.add(etykietaOdp);
+		panel.add(przewijanieOdp);
+		panel.add(przyciskStart);
+		panel.add(przyciskWyslij);
+		
+		
+		przyciskStart.addActionListener(new PrzyciskStartListener());
+		przyciskWyslij.addActionListener(new PrzyciskWyslijListener());
+		
+		
+		ramka.getContentPane().add(BorderLayout.CENTER, panel);
+		ramka.setSize(500, 400);
+		ramka.setVisible(true);	
+	}
+	
+	
+// Konfiguracja sieci ok !
+	public void konfigurujKomunikacje() {
+		
+		try {
+			
+				pytanie.append("Witam na teœcie!");
+				
+				gniazdo = new Socket("127.0.0.1", 4995);
+				
+				
+				
+				String str = "Hello";
+				pisarz = new PrintWriter(gniazdo.getOutputStream());
+				pisarz.println(str);
+				
+				InputStreamReader czytelnikStrm = new InputStreamReader(gniazdo.getInputStream());
+				czytelnik = new BufferedReader(czytelnikStrm);
+				
+				
+				String pytanie1;
+				pytanie1 = czytelnik.readLine();
+				czytelnik.close();
+				
+				String[]podzielone1 = pytanie1.split("/");
+				for (int k = 0; k<6; k++) {
+				pytanie.append(podzielone1[k] + '\n' );
+				}
+			
+				pisarz.println("Odpowiedz:");
+				pisarz.close();
+				
+				
+				String pytanie2;
+				pytanie2 = czytelnik.readLine();
+				czytelnik.close();
+				
+				
+				String[]podzielone2 = pytanie2.split("/");
+				for (int k = 0; k<6; k++) {
+				pytanie.append(podzielone2[k] + '\n' );
+				}
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			}
+			
+		catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+	}
+	
+	
+//	public void pobierzPytanie() {
+			
+//		String a= "abc";
+		
+		
+//		try {
+//					a = czytelnik.readLine();
+//					String[]b = a.split("/");
+				
+//					for (int k = 0; k<6; k++) {
+//					pytanie.append(b[k] + '\n' );
+			
+//			}
+					
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+
+	
+//	public void wyslijWiadomosc(String message) {
+//		try {
+//			pytanie.setText("");
+//			pisarz.println(message);
+//			pytanie.append("Wys³ano wiadomoœæ: " + message);
+//			pisarz.flush();
+//			pisarz.close();
+//		}
+//		catch(Exception e1) 
+//		{
+//			e1.printStackTrace();
+//		}
+//	}
+	
+	
+	public class PrzyciskStartListener implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			
+			try {
+					konfigurujKomunikacje();
+				}
+			catch(Exception e1) 
+				{
+					e1.printStackTrace();
+				}
+		}
+	}
+	
+	public class PrzyciskWyslijListener implements ActionListener {
+		
+		public void actionPerformed(ActionEvent e) {
+			
+//			wyslijWiadomosc(odpowiedz.getText());
+//			odpowiedz.setText("");
+		}
+	}
+	
+	
+
+	
+	
+	public static void main(String[] args) {
+		
+		AplikacjaTest2 aplikacja = new AplikacjaTest2();
+		aplikacja.doDziela();
+		
+	}
+
+}

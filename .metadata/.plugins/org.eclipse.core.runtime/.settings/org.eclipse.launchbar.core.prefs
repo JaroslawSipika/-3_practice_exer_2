@@ -1,0 +1,10 @@
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch=x86_64
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
+LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:Serwer1,org.eclipse.launchbar.core.descriptorType.default\:Serwer,org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest,org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest2,org.eclipse.launchbar.core.descriptorType.default\:Sluchacze,org.eclipse.launchbar.core.descriptorType.default\:Zadanie3,org.eclipse.launchbar.core.descriptorType.default\:Test,org.eclipse.launchbar.core.descriptorType.default\:Rozmowa,org.eclipse.launchbar.core.descriptorType.default\:Serwer2,org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest3,org.eclipse.launchbar.core.descriptorType.default\:Serwer2 (1),org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest3 (1),org.eclipse.launchbar.core.descriptorType.default\:MojaUslugaImpl,org.eclipse.launchbar.core.descriptorType.default\:MojaUslugaKlient
+eclipse.preferences.version=1
+org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
+org.eclipse.launchbar.core.descriptorType.default\:AplikacjaTest3/activeLaunchMode=coverage
+org.eclipse.launchbar.core.descriptorType.default\:Serwer/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:Serwer2/activeLaunchMode=run

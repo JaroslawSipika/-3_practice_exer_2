@@ -1,0 +1,7 @@
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface MojaUsluga extends Remote{
+	public String ZamienNaONP() throws RemoteException;
+	public double ObliczONP() throws RemoteException;
+}
